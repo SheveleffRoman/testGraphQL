@@ -53,23 +53,6 @@ function App() {
     variables: variables || "",
   };
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const parsed = JSON.parse(graphqlQuery.variables)
-  //       const response = await fetchAllData(endpoint, {...graphqlQuery, variables: parsed});
-  //       setDataAxios(response.data);
-  //       setError(null);
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //       setError(error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, [endpoint, query]);
-
-  // const { data } = characterAPI.useGetCharactersQuery(query);
 
   const fetchData = async () => {
     try {
@@ -154,31 +137,3 @@ function App() {
 }
 
 export default App;
-
-// const dataWithoutTypename = removeTypename(data);
-
-// return (
-//   <div>
-//     <h1>Rick Morty Characters</h1>
-//     <pre>{JSON.stringify(dataWithoutTypename, null, 2)}</pre>
-//   </div>
-// );
-
-// function removeTypename(obj) {
-//   if (obj === null || typeof obj !== "object") {
-//     return obj;
-//   }
-
-//   if (Array.isArray(obj)) {
-//     return obj.map((item) => removeTypename(item));
-//   }
-
-//   const newObj = {};
-//   for (const key in obj) {
-//     if (key !== "__typename") {
-//       newObj[key] = removeTypename(obj[key]);
-//     }
-//   }
-
-//   return newObj;
-// }
