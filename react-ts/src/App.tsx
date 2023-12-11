@@ -28,15 +28,14 @@ https://beta.pokeapi.co/graphql/v1beta
 */
 
 function App() {
-  const startQuery = `
-  {
-    characters {
+  const startQuery = 
+  `query GetCharacters($page: Int) {
+    characters(page: $page) {
       results {
         name
       }
     }
-  }
-  `;
+}`;
 
   const [query, setFieldName] = useState(startQuery);
   const [dataAxios, setDataAxios] = useState(null);
@@ -46,41 +45,71 @@ function App() {
   const [endpoint, setEndpoint] = useState(
     "https://rickandmortyapi.com/graphql"
   );
+  const [variables, setVariables] = useState("{}");
 
   const graphqlQuery = {
-    query: `query ${value}`,
-    variables: {},
+    operationName: "",
+    query: `${value}`,
+    variables: variables || "",
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetchAllData(endpoint, graphqlQuery);
-        setDataAxios(response.data);
-        setError(null);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-        setError(error);
-      }
-    };
+  // useEffect(() => {
+  //   const fetchData = async () => {
+  //     try {
+  //       const parsed = JSON.parse(graphqlQuery.variables)
+  //       const response = await fetchAllData(endpoint, {...graphqlQuery, variables: parsed});
+  //       setDataAxios(response.data);
+  //       setError(null);
+  //     } catch (error) {
+  //       console.error("Error fetching data:", error);
+  //       setError(error);
+  //     }
+  //   };
 
-    fetchData();
-  }, [endpoint, query]);
+  //   fetchData();
+  // }, [endpoint, query]);
 
   // const { data } = characterAPI.useGetCharactersQuery(query);
 
+  const fetchData = async () => {
+    try {
+      const parsed = JSON.parse(graphqlQuery.variables);
+      const nameRegex = /query ([\w]+)/;
+      const match = value.match(nameRegex)!;
+      const response = await fetchAllData(endpoint, {
+        ...graphqlQuery,
+        operationName: match[1],
+        variables: parsed,
+      });
+      setDataAxios(response.data);
+      setError(null);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+      setError(error);
+    }
+  };
+
   const handleClick = () => {
     setFieldName(value);
+    fetchData();
   };
 
   const handleChangeEndpoint = (event: ChangeEvent<HTMLInputElement>) => {
-    setEndpoint(event.target.value)
-  }
+    setEndpoint(event.target.value);
+  };
 
+  // const handleChangeVariables = (event: ChangeEvent<HTMLInputElement>) => {
+  //   setVariables(event.target.value);
+  // };
 
   const onChange = useCallback((val: string) => {
     console.log("val:", val);
     setValue(val);
+  }, []);
+
+  const onChangeVariables = useCallback((val: string) => {
+    console.log("val:", val);
+    setVariables(val);
   }, []);
 
   // if (isLoading) return "Loading...";
@@ -103,11 +132,22 @@ function App() {
         value={value}
         extensions={[langs.json()]}
       />
+      <h5>Variables:</h5>
+      <CodeMirror
+        height="100px"
+        width="700px"
+        onChange={onChangeVariables}
+        extensions={[langs.json()]}
+        placeholder={'{"page": 5}'}
+      />
       <button onClick={handleClick}>response</button>
       {error ? (
         <h2>{error.message}</h2>
       ) : (
-        <pre>{JSON.stringify(dataAxios, null, 2)}</pre>
+        <>
+          {!dataAxios && <></>}
+          {dataAxios && <pre>{JSON.stringify(dataAxios, null, 2)}</pre>}
+        </>
       )}
     </div>
   );
