@@ -81,10 +81,6 @@ function App() {
     setEndpoint(event.target.value);
   };
 
-  // const handleChangeVariables = (event: ChangeEvent<HTMLInputElement>) => {
-  //   setVariables(event.target.value);
-  // };
-
   const onChange = useCallback((val: string) => {
     console.log("val:", val);
     setValue(val);
